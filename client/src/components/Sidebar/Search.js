@@ -24,8 +24,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Search = ({ handleChange }) => {
+const Search = (props) => {
   const classes = useStyles();
+  const { handleChange } = props;
 
   const handleSubmit = (event) => {
     event.preventDefault();

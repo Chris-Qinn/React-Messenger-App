@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React from "react";
+import { Redirect, useHistory } from "react-router-dom";
+import { connect } from "react-redux";
 import {
   Grid,
   Box,
@@ -7,33 +8,31 @@ import {
   Button,
   FormControl,
   TextField,
-} from '@material-ui/core';
+} from "@material-ui/core";
+import { login } from "./store/utils/thunkCreators";
 
-const Login = ({ user, login }) => {
+const Login = (props) => {
   const history = useHistory();
+  const { user, login } = props;
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formElements = form.elements;
-    const username = formElements.username.value;
-    const password = formElements.password.value;
+    const username = event.target.username.value;
+    const password = event.target.password.value;
 
     await login({ username, password });
   };
 
-  useEffect(() => {
-    if (user && user.id) history.push('/home');
-  }, [user, history]);
+  if (user.id) {
+    return <Redirect to="/home" />;
+  }
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container justify="center">
       <Box>
         <Grid container item>
           <Typography>Need to register?</Typography>
-          <Link href="/register" to="/register">
-            <Button>Register</Button>
-          </Link>
+          <Button onClick={() => history.push("/register")}>Register</Button>
         </Grid>
         <form onSubmit={handleLogin}>
           <Grid>
@@ -67,4 +66,18 @@ const Login = ({ user, login }) => {
   );
 };
 
-export default Login;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    login: (credentials) => {
+      dispatch(login(credentials));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

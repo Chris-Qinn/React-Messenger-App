@@ -1,25 +1,21 @@
-import React from 'react';
-import { MuiThemeProvider } from '@material-ui/core';
-import { BrowserRouter } from 'react-router-dom';
+import React from "react";
+import { MuiThemeProvider } from "@material-ui/core";
+import { BrowserRouter } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store";
 
-import { theme } from './themes/theme';
-import Routes from './routes';
-import axios from 'axios';
-
-axios.interceptors.request.use(async function (config) {
-  const token = await localStorage.getItem('messenger-token');
-  config.headers['x-access-token'] = token;
-
-  return config;
-});
+import { theme } from "./themes/theme";
+import Routes from "./routes";
 
 function App() {
   return (
-    <MuiThemeProvider theme={theme}>
-      <BrowserRouter>
-        <Routes />
-      </BrowserRouter>
-    </MuiThemeProvider>
+    <Provider store={store}>
+      <MuiThemeProvider theme={theme}>
+        <BrowserRouter>
+          <Routes />
+        </BrowserRouter>
+      </MuiThemeProvider>
+    </Provider>
   );
 }
 

@@ -23,8 +23,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const UserAvatar = ({ sidebar, username, photoUrl, online }) => {
+const UserAvatar = (props) => {
   const classes = useStyles();
+  const { sidebar, username, photoUrl, online } = props;
 
   return (
     <Box className={sidebar ? classes.sidebar : ""}>
@@ -32,9 +33,13 @@ const UserAvatar = ({ sidebar, username, photoUrl, online }) => {
         classes={{ badge: `${classes.badge} ${online && classes.online}` }}
         variant="dot"
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-        overlap="circular"
+        overlap="circle"
       >
-        <Avatar alt={username} src={photoUrl} className={classes.profilePic} />
+        <Avatar
+          alt={username}
+          src={photoUrl}
+          className={classes.profilePic}
+        ></Avatar>
       </Badge>
     </Box>
   );

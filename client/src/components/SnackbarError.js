@@ -13,19 +13,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SnackbarError = ({ setSnackBarOpen, errorMessage, snackBarOpen }) => {
+const SnackbarError = (props) => {
   const classes = useStyles();
   return (
     <Snackbar
-      open={snackBarOpen}
-      onClose={() => setSnackBarOpen(false)}
-      message={errorMessage || "Sorry, an error occured. Please try again"}
+      open={props.snackBarOpen}
+      onClose={() => props.setSnackBarOpen(false)}
+      message={
+        props.errorMessage || "Sorry, an error occured. Please try again"
+      }
       action={
         <React.Fragment>
           <Button
             className={classes.icon}
             size="small"
-            onClick={() => setSnackBarOpen(false)}
+            onClick={() => props.setSnackBarOpen(false)}
           >
             <Close color="secondary" />
           </Button>

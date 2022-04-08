@@ -1,23 +1,26 @@
-import React, { useState } from 'react';
-import { FormControl, FilledInput } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState } from "react";
+import { FormControl, FilledInput } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import { postMessage } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
-    justifySelf: 'flex-end',
+    justifySelf: "flex-end",
     marginTop: 15,
   },
   input: {
     height: 70,
-    backgroundColor: '#F4F6FA',
+    backgroundColor: "#F4F6FA",
     borderRadius: 8,
     marginBottom: 20,
   },
 }));
 
-const Input = ({ otherUser, conversationId, user, postMessage }) => {
+const Input = (props) => {
   const classes = useStyles();
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
+  const { postMessage, otherUser, conversationId, user } = props;
 
   const handleChange = (event) => {
     setText(event.target.value);
@@ -25,17 +28,14 @@ const Input = ({ otherUser, conversationId, user, postMessage }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formElements = form.elements;
-    // add sender user info if posting to a brand new convo, so that the other user will have access to username, profile pic, etc.
     const reqBody = {
-      text: formElements.text.value,
+      text: event.target.text.value,
       recipientId: otherUser.id,
       conversationId,
-      sender: conversationId ? null : user,
+      sender: user,
     };
     await postMessage(reqBody);
-    setText('');
+    setText("");
   };
 
   return (
@@ -54,4 +54,12 @@ const Input = ({ otherUser, conversationId, user, postMessage }) => {
   );
 };
 
-export default Input;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    postMessage: (message) => {
+      dispatch(postMessage(message));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(Input);

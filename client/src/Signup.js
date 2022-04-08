@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import React, { useState } from "react";
+import { Redirect, useHistory } from "react-router-dom";
+import { connect } from "react-redux";
 import {
   Grid,
   Box,
@@ -8,41 +9,39 @@ import {
   FormControl,
   TextField,
   FormHelperText,
-} from '@material-ui/core';
+} from "@material-ui/core";
+import { register } from "./store/utils/thunkCreators";
 
-const Signup = ({ user, register }) => {
+const Login = (props) => {
   const history = useHistory();
-
+  const { user, register } = props;
   const [formErrorMessage, setFormErrorMessage] = useState({});
 
   const handleRegister = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formElements = form.elements;
-    const username = formElements.username.value;
-    const email = formElements.email.value;
-    const password = formElements.password.value;
-    const confirmPassword = formElements.confirmPassword.value;
+    const username = event.target.username.value;
+    const email = event.target.email.value;
+    const password = event.target.password.value;
+    const confirmPassword = event.target.confirmPassword.value;
 
     if (password !== confirmPassword) {
-      setFormErrorMessage({ confirmPassword: 'Passwords must match' });
+      setFormErrorMessage({ confirmPassword: "Passwords must match" });
       return;
     }
+
     await register({ username, email, password });
   };
 
-  useEffect(() => {
-    if (user && user.id) history.push('/home');
-  }, [user, history]);
+  if (user.id) {
+    return <Redirect to="/home" />;
+  }
 
   return (
-    <Grid container justifyContent="center">
+    <Grid container justify="center">
       <Box>
         <Grid container item>
           <Typography>Need to log in?</Typography>
-          <Link href="/login" to="/login">
-            <Button>Login</Button>
-          </Link>
+          <Button onClick={() => history.push("/login")}>Login</Button>
         </Grid>
         <form onSubmit={handleRegister}>
           <Grid>
@@ -108,4 +107,18 @@ const Signup = ({ user, register }) => {
   );
 };
 
-export default Signup;
+const mapStateToProps = (state) => {
+  return {
+    user: state.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    register: (credentials) => {
+      dispatch(register(credentials));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Login);

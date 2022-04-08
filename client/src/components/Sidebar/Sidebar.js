@@ -1,7 +1,8 @@
-import React from 'react';
-import { Box, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { Search, Chat, CurrentUser } from './index';
+import React from "react";
+import { Box, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
+import { connect } from "react-redux";
+import { Search, Chat, CurrentUser } from "./index.js";
 
 const useStyles = makeStyles(() => ({
   root: {
@@ -12,24 +13,20 @@ const useStyles = makeStyles(() => ({
   title: {
     fontSize: 20,
     letterSpacing: -0.29,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 32,
     marginBottom: 15,
   },
 }));
 
-const Sidebar = ({
-  handleChange,
-  searchTerm,
-  conversations = [],
-  user,
-  setActiveChat,
-}) => {
+const Sidebar = (props) => {
   const classes = useStyles();
+  const conversations = props.conversations || [];
+  const { handleChange, searchTerm } = props;
 
   return (
     <Box className={classes.root}>
-      <CurrentUser user={user} />
+      <CurrentUser />
       <Typography className={classes.title}>Chats</Typography>
       <Search handleChange={handleChange} />
       {conversations
@@ -41,7 +38,6 @@ const Sidebar = ({
             <Chat
               conversation={conversation}
               key={conversation.otherUser.username}
-              setActiveChat={setActiveChat}
             />
           );
         })}
@@ -49,4 +45,10 @@ const Sidebar = ({
   );
 };
 
-export default Sidebar;
+const mapStateToProps = (state) => {
+  return {
+    conversations: state.conversations,
+  };
+};
+
+export default connect(mapStateToProps)(Sidebar);

@@ -1,30 +1,19 @@
-import React, { useState } from 'react';
-import { Sidebar } from './index';
-import axios from 'axios';
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import { Sidebar } from "./index";
+import { searchUsers } from "../../store/utils/thunkCreators";
+import { clearSearchedUsers } from "../../store/conversations";
 
-const SidebarContainer = ({
-  conversations,
-  user,
-  clearSearchedUsers,
-  addSearchedUsers,
-  setActiveChat,
-}) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const SidebarContainer = (props) => {
+  const { searchUsers, clearSearchedUsers } = props;
 
-  const searchUsers = async (searchTerm) => {
-    try {
-      const { data } = await axios.get(`/api/users/${searchTerm}`);
-      addSearchedUsers(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleChange = async (event) => {
-    if (event.target.value === '') {
-      // clear searched convos
+    if (event.target.value === "") {
+      // clear searched convos from redux store
       clearSearchedUsers();
-      setSearchTerm('');
+      setSearchTerm("");
       return;
     }
     if (searchTerm.includes(event.target.value)) {
@@ -36,15 +25,18 @@ const SidebarContainer = ({
     setSearchTerm(event.target.value);
   };
 
-  return (
-    <Sidebar
-      handleChange={handleChange}
-      searchTerm={searchTerm}
-      conversations={conversations}
-      user={user}
-      setActiveChat={setActiveChat}
-    />
-  );
+  return <Sidebar handleChange={handleChange} searchTerm={searchTerm} />;
 };
 
-export default SidebarContainer;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    searchUsers: (username) => {
+      dispatch(searchUsers(username));
+    },
+    clearSearchedUsers: () => {
+      dispatch(clearSearchedUsers());
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(SidebarContainer);
