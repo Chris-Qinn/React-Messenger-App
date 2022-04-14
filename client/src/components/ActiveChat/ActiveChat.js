@@ -1,49 +1,66 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Box } from "@material-ui/core";
-import { Input, Header, Messages } from "./index";
-import { connect } from "react-redux";
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import { Box } from '@material-ui/core';
+import { Input, Header, Messages } from './index';
 
 const useStyles = makeStyles(() => ({
   root: {
-    display: "flex",
+    display: 'flex',
     flexGrow: 8,
-    flexDirection: "column",
+    flexDirection: 'column',
   },
   chatContainer: {
     marginLeft: 41,
     marginRight: 41,
-    display: "flex",
-    flexDirection: "column",
+    display: 'flex',
+    flexDirection: 'column',
     flexGrow: 1,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
 }));
 
-const ActiveChat = (props) => {
+const ActiveChat = ({
+  user,
+  conversations,
+  activeConversation,
+  postMessage,
+}) => {
   const classes = useStyles();
-  const { user } = props;
-  const conversation = props.conversation || {};
+
+  const conversation = conversations
+    ? conversations.find(
+        (conversation) => conversation.otherUser.username === activeConversation
+      )
+    : {};
+
+  const isConversation = (obj) => {
+    return obj !== {} && obj !== undefined;
+  };
 
   return (
     <Box className={classes.root}>
-      {conversation.otherUser && (
+      {isConversation(conversation) && conversation.otherUser && (
         <>
           <Header
             username={conversation.otherUser.username}
             online={conversation.otherUser.online || false}
           />
           <Box className={classes.chatContainer}>
-            <Messages
-              messages={conversation.messages}
-              otherUser={conversation.otherUser}
-              userId={user.id}
-            />
-            <Input
-              otherUser={conversation.otherUser}
-              conversationId={conversation.id}
-              user={user}
-            />
+            {user && (
+              <>
+                <Messages
+                  messages={conversation.messages}
+                  otherUser={conversation.otherUser}
+                  userId={user.id}
+                />
+                <Input
+                  otherUser={conversation.otherUser}
+                  conversationId={conversation.id || null}
+                  user={user}
+                  postMessage={postMessage}
+                />
+              </>
+            )}
           </Box>
         </>
       )}
@@ -51,16 +68,4 @@ const ActiveChat = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.user,
-    conversation:
-      state.conversations &&
-      state.conversations.find(
-        (conversation) =>
-          conversation.otherUser.username === state.activeConversation
-      ),
-  };
-};
-
-export default connect(mapStateToProps, null)(ActiveChat);
+export default ActiveChat;
